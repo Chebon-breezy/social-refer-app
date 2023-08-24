@@ -1,44 +1,30 @@
 <?php
-
 session_start();
-
-$package = $_SESSION['package'];
-
-if ($package != 250) {
-    header('Location: packages.php');
+if (!isset($_SESSION['user_id'])) {
+    header('Location: login.php');
+    exit();
 }
 
+$selectedPackage = $_SESSION['selected_package'];
+
+if ($selectedPackage != '250') {
+    header('Location: packages.php');
+    exit();
+}
 ?>
 
+<!DOCTYPE html>
 <html>
 
+<head>
+    <!-- Include your CSS and other head content -->
+</head>
+
 <body>
-
-    <div class="container">
-
-        <h1>Package 250</h1>
-
-        <p>Details about 250 package</p>
-
-        <?php
-        // Fetch package details from database
-        $sql = "SELECT * FROM packages WHERE id = 250";
-
-        $result = mysqli_query($conn, $sql);
-
-        if (mysqli_num_rows($result) > 0) {
-            $row = mysqli_fetch_assoc($result);
-
-            echo "<div class='package-details'>";
-            echo "<h2>" . $row['name'] . "</h2>";
-            echo "<p>" . $row['details'] . "</p>";
-            echo "<p>Price: " . $row['price'] . "</p>";
-            echo "</div>";
-        }
-        ?>
-
-    </div>
-
+    <h1>Package 250 Page</h1>
+    <p>Thank you for choosing the KSH 250 package.</p>
+    <!-- Include your JavaScript scripts -->
+    <script src="js/script.js"></script>
 </body>
 
 </html>

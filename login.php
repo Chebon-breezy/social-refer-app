@@ -1,26 +1,59 @@
-// Connect to database
-
-// Get form data
-$phone = $_POST['phone'];
-$password = $_POST['password'];
-
-// Query database to check if user exists
-$sql = "SELECT * FROM users WHERE phone='$phone' AND password='$password'";
-
-// Check if user exists
-if($user = mysqli_fetch_assoc()) {
-
-// Start session
+<?php
 session_start();
+include_once 'includes/db_connect.php';
 
-// Store user details in session
-$_SESSION['id'] = $user['id'];
-$_SESSION['name'] = $user['name'];
+$message = '';
 
-// Redirect to packages page
-header('Location: packages.php');
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $phoneNumber = $_POST['phoneNumber'];
+    $password = $_POST['password'];
 
-} else {
-// Invalid login, redirect back to index
-header('Location: index.php');
+    $sql = "SELECT * FROM users WHERE phoneNumber='$phoneNumber'";
+    $result = $conn->query($sql);
+
+    if ($result->num_rows === 1) {
+        $user = $result->fetch_assoc();
+
+        if (isset($user['password']) && password_verify($password, $user['password'])) {
+            $_SESSION['user_id'] = $user['id'];
+            ob_start(); // Start output buffering
+            header('Location: packages.php');
+            ob_end_flush(); // Flush the buffer and redirect
+            exit();
+        } else {
+            $message = "Invalid password.";
+        }
+    } else {
+        $message = "User not found.";
+    }
 }
+?>
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <!-- Include your CSS and other head content -->
+</head>
+
+<body>
+    <h1>Login</h1>
+    <form method="post">
+        <div>
+            <label for="phoneNumber">Phone Number:</label>
+            <input type="text" name="phoneNumber" required>
+        </div>
+        <div>
+            <label for="password">Password:</label>
+            <input type="password" name="password" required>
+        </div>
+        <div>
+            <button type="submit">Login</button>
+        </div>
+    </form>
+    <p><?php echo $message; ?></p>
+    <!-- Include your JavaScript scripts -->
+    <script src="js/script.js"></script>
+</body>
+
+</html>

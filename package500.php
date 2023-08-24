@@ -1,18 +1,30 @@
 <?php
+session_start();
+if (!isset($_SESSION['user_id'])) {
+    header('Location: login.php');
+    exit();
+}
 
-// Connect to database
-include 'db_connect.php';
+$selectedPackage = $_SESSION['selected_package'];
 
-// Get package details
-$sql = "SELECT * FROM packages WHERE id = 500";
-$result = mysqli_query($conn, $sql);
-
-$package = mysqli_fetch_assoc($result);
-
+if ($selectedPackage != '500') {
+    header('Location: packages.php');
+    exit();
+}
 ?>
 
-<h1><?php echo $package['name']; ?></h1>
+<!DOCTYPE html>
+<html>
 
-<p><?php echo $package['details']; ?></p>
+<head>
+    <!-- Include your CSS and other head content -->
+</head>
 
-<p>Price: <?php echo $package['price']; ?></p>
+<body>
+    <h1>Package 500 Page</h1>
+    <p>Thank you for choosing the KSH 500 package.</p>
+    <!-- Include your JavaScript scripts -->
+    <script src="js/script.js"></script>
+</body>
+
+</html>
