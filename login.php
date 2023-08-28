@@ -11,6 +11,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $sql = "SELECT * FROM users WHERE phoneNumber='$phoneNumber'";
     $result = $conn->query($sql);
 
+    echo "Received password: " . $password;
+
     if ($result->num_rows === 1) {
         $user = $result->fetch_assoc();
 
@@ -23,6 +25,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             $message = "Invalid password.";
         }
+
+        echo "Password verification result: " . $result;
     } else {
         $message = "User not found.";
     }
