@@ -5,32 +5,39 @@ include_once 'includes/db_connect.php';
 $message = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $phoneNumber = $_POST['phoneNumber'];
+    $phoneNumber = mysqli_real_escape_string($conn, $_POST['phoneNumber']);
     $password = $_POST['password'];
 
-    $sql = "SELECT * FROM users WHERE phoneNumber='$phoneNumber'";
-    $result = $conn->query($sql);
+    $stmt = $conn->prepare("SELECT * FROM users WHERE phoneNumber = ?");
+    $stmt->bind_param("s", $phoneNumber);
+    $stmt->execute();
 
-    echo "Received password: " . $password;
+    $result = $stmt->get_result();
 
-    if ($result->num_rows === 1) {
+    if ($result->num_rows > 0) {
         $user = $result->fetch_assoc();
 
-        if (isset($user['password']) && password_verify($password, $user['password'])) {
-            $_SESSION['user_id'] = $user['id'];
-            ob_start(); // Start output buffering
-            header('Location: packages.php');
-            ob_end_flush(); // Flush the buffer and redirect
-            exit();
-        } else {
-            $message = "Invalid password.";
-        }
+        if (array_key_exists('password', $user)) {
+            echo 'Fetched password: ' . $user['password'];
 
-        echo "Password verification result: " . $result;
+            if (password_verify($password, $user['password'])) {
+                $_SESSION['user_id'] = $user['id'];
+                ob_start();
+                header('Location: packages.php');
+                ob_end_flush();
+                exit();
+            } else {
+                $message = "Invalid phone number or password.";
+            }
+        } else {
+            echo "Password does not exist for this user.";
+        }
     } else {
-        $message = "User not found.";
+        $message = "Invalid phone number or password.";
     }
+    $stmt->close();
 }
+
 ?>
 
 <!DOCTYPE html>

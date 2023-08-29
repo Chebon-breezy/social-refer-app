@@ -4,22 +4,22 @@ include_once 'includes/db_connect.php';
 $message = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Extract data from the form
-    $phoneNumber = $_POST['phoneNumber'];
-    $names = $_POST['names'];
-    $email = $_POST['email'];
+    $phoneNumber = mysqli_real_escape_string($conn, $_POST['phoneNumber']);
+    $names = mysqli_real_escape_string($conn, $_POST['names']);
+    $email = mysqli_real_escape_string($conn, $_POST['email']);
     $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
 
-    // Insert data into the database
-    $sql = "INSERT INTO users (phoneNumber, names, email, password) VALUES ('$phoneNumber', '$names', '$email', '$password')";
-    $result = $conn->query($sql);
+    $stmt = $conn->prepare("INSERT INTO users (phoneNumber, names, email, password) VALUES (?, ?, ?, ?)");
+    $stmt->bind_param("ssss", $phoneNumber, $names, $email, $password);
 
-    if ($result) {
+    if ($stmt->execute()) {
         $message = "Registration successful.";
     } else {
-        $message = "Error: " . $sql . "<br>" . $conn->error;
+        $message = "Error: " . $stmt->error;
     }
+    $stmt->close();
 }
+
 ?>
 
 <!DOCTYPE html>
